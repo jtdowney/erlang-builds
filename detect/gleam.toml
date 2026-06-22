@@ -1,0 +1,28 @@
+name = "detect"
+version = "1.0.0"
+
+[dependencies]
+argv = ">= 1.1.0 and < 2.0.0"
+gleam_json = ">= 3.1.0 and < 4.0.0"
+gleam_stdlib = ">= 1.0.0 and < 2.0.0"
+simplifile = ">= 2.4.0 and < 3.0.0"
+tom = ">= 2.1.0 and < 3.0.0"
+
+[dev_dependencies]
+gleeunit = ">= 1.11.0 and < 2.0.0"
+birdie = ">= 2.0.1 and < 3.0.0"
+
+[tools.detect.targets]
+otp_lines = ["28", "29"]
+arches = ["amd64", "arm64"]
+distros = [
+  { codename = "bullseye", image = "debian:bullseye" },
+  { codename = "bookworm", image = "debian:bookworm" },
+  { codename = "trixie", image = "debian:trixie" },
+  { codename = "forky", image = "debian:forky" },
+  { codename = "jammy", image = "ubuntu:22.04" },
+  { codename = "noble", image = "ubuntu:24.04" },
+  { codename = "questing", image = "ubuntu:25.10" },
+  { codename = "resolute", image = "ubuntu:26.04" },
+  { codename = "stonking", image = "ubuntu:26.10" },
+]

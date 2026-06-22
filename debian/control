@@ -1,0 +1,77 @@
+Source: erlang
+Section: interpreters
+Priority: optional
+Maintainer: Johnn Downey <jdowney@gmail.com>
+Build-Depends:
+ debhelper-compat (= 13),
+ gawk,
+ m4,
+ libncurses-dev,
+ libssl-dev,
+ zlib1g-dev,
+ unixodbc-dev,
+ libwxgtk3.2-dev | libwxgtk3.0-gtk3-dev,
+ libwxgtk-webview3.2-dev | libwxgtk-webview3.0-gtk3-dev,
+ libgl-dev | libgl1-mesa-dev,
+ libglu-dev | libglu1-mesa-dev,
+ libpng-dev,
+ libsctp-dev,
+ libsystemd-dev [linux-any]
+Standards-Version: 4.6.2
+Homepage: https://www.erlang.org/
+
+Package: erlang
+Architecture: any
+Depends: procps, libsctp1, ${shlibs:Depends}, ${misc:Depends}
+Conflicts: erlang-base, erlang-asn1, erlang-common-test, erlang-crypto,
+ erlang-debugger, erlang-dialyzer, erlang-diameter, erlang-edoc, erlang-eldap,
+ erlang-et, erlang-eunit, erlang-ftp, erlang-inets, erlang-megaco,
+ erlang-mnesia, erlang-observer, erlang-os-mon, erlang-parsetools,
+ erlang-public-key, erlang-reltool, erlang-runtime-tools, erlang-snmp,
+ erlang-ssh, erlang-ssl, erlang-syntax-tools, erlang-tftp, erlang-tools,
+ erlang-xmerl, erlang-src, erlang-examples
+Replaces: erlang-base, erlang-asn1, erlang-common-test, erlang-crypto,
+ erlang-debugger, erlang-dialyzer, erlang-diameter, erlang-edoc, erlang-eldap,
+ erlang-et, erlang-eunit, erlang-ftp, erlang-inets, erlang-megaco,
+ erlang-mnesia, erlang-observer, erlang-os-mon, erlang-parsetools,
+ erlang-public-key, erlang-reltool, erlang-runtime-tools, erlang-snmp,
+ erlang-ssh, erlang-ssl, erlang-syntax-tools, erlang-tftp, erlang-tools,
+ erlang-xmerl, erlang-src, erlang-examples
+Provides: erlang-base (= ${binary:Version}),
+ erlang-asn1 (= ${binary:Version}), erlang-common-test (= ${binary:Version}),
+ erlang-crypto (= ${binary:Version}), erlang-debugger (= ${binary:Version}),
+ erlang-dialyzer (= ${binary:Version}), erlang-diameter (= ${binary:Version}),
+ erlang-edoc (= ${binary:Version}), erlang-eldap (= ${binary:Version}),
+ erlang-et (= ${binary:Version}), erlang-eunit (= ${binary:Version}),
+ erlang-ftp (= ${binary:Version}), erlang-inets (= ${binary:Version}),
+ erlang-megaco (= ${binary:Version}), erlang-mnesia (= ${binary:Version}),
+ erlang-observer (= ${binary:Version}), erlang-os-mon (= ${binary:Version}),
+ erlang-parsetools (= ${binary:Version}), erlang-public-key (= ${binary:Version}),
+ erlang-reltool (= ${binary:Version}), erlang-runtime-tools (= ${binary:Version}),
+ erlang-snmp (= ${binary:Version}), erlang-ssh (= ${binary:Version}),
+ erlang-ssl (= ${binary:Version}), erlang-syntax-tools (= ${binary:Version}),
+ erlang-tftp (= ${binary:Version}), erlang-tools (= ${binary:Version}),
+ erlang-xmerl (= ${binary:Version}), erlang-src (= ${binary:Version}),
+ erlang-examples (= ${binary:Version})
+Description: Concurrent, functional programming language (runtime)
+ Erlang/OTP runtime system: ERTS plus the standard application set,
+ built from upstream source.
+
+Package: erlang-dev
+Architecture: any
+Depends: erlang (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
+Description: Erlang/OTP development headers and erl_interface
+ Headers and erl_interface needed to build native (NIF/port) code
+ against this Erlang/OTP build.
+
+Package: erlang-wx
+Architecture: any
+Depends: erlang (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
+Description: Erlang/OTP wx (GUI) application
+ The wx application and observer GUI. Pulls in GTK/X11 dependencies.
+
+Package: erlang-odbc
+Architecture: any
+Depends: erlang (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
+Description: Erlang/OTP ODBC application
+ Database connectivity through unixODBC.

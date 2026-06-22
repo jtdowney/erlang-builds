@@ -1,0 +1,7 @@
+[tools.detect.targets]
+otp_lines = ["28", "29"]
+arches = ["amd64", "arm64"]
+distros = [
+  { codename = "bookworm", image = "debian:bookworm" },
+  { codename = "noble", image = "ubuntu:24.04" },
+]

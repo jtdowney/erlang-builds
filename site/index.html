@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>Erlang/OTP APT repository</title>
+        <link
+            rel="stylesheet"
+            href="https://cdn.jsdelivr.net/npm/@picocss/pico@2.1.1/css/pico.min.css"
+        />
+    </head>
+
+    <body>
+        <header class="container">
+            <h1>Erlang/OTP APT repository</h1>
+        </header>
+        <main class="container">
+            <p>Signed Debian/Ubuntu packages for Erlang/OTP (amd64 + arm64).</p>
+            <pre>
+curl -fsSL __BASE_URL__/key.gpg | sudo gpg --dearmor -o /usr/share/keyrings/erlang.gpg
+echo "deb [signed-by=/usr/share/keyrings/erlang.gpg] __BASE_URL__ $(. /etc/os-release; echo $VERSION_CODENAME) main" \
+  | sudo tee /etc/apt/sources.list.d/erlang.list
+sudo tee /etc/apt/preferences.d/erlang.pref <<'EOF'
+Package: erlang*
+Pin: origin jtdowney.github.io
+Pin-Priority: 1001
+EOF
+sudo apt update
+sudo apt install erlang
+</pre
+            >
+            <p>
+                Optional components: <code>erlang-dev</code>,
+                <code>erlang-wx</code>, <code>erlang-odbc</code>.
+            </p>
+        </main>
+    </body>
+</html>

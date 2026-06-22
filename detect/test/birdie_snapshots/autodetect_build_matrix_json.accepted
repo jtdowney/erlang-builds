@@ -1,0 +1,5 @@
+---
+version: 2.0.1
+title: autodetect build matrix json
+---
+[{"otp":"28.1","codename":"bookworm","image":"debian:bookworm","arch":"arm64","runner":"ubuntu-24.04-arm"},{"otp":"28.1","codename":"noble","image":"ubuntu:24.04","arch":"amd64","runner":"ubuntu-24.04"},{"otp":"28.1","codename":"noble","image":"ubuntu:24.04","arch":"arm64","runner":"ubuntu-24.04-arm"},{"otp":"29.0","codename":"bookworm","image":"debian:bookworm","arch":"amd64","runner":"ubuntu-24.04"},{"otp":"29.0","codename":"bookworm","image":"debian:bookworm","arch":"arm64","runner":"ubuntu-24.04-arm"},{"otp":"29.0","codename":"noble","image":"ubuntu:24.04","arch":"amd64","runner":"ubuntu-24.04"},{"otp":"29.0","codename":"noble","image":"ubuntu:24.04","arch":"arm64","runner":"ubuntu-24.04-arm"}]

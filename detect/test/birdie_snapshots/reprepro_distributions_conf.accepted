@@ -1,0 +1,22 @@
+---
+version: 2.0.1
+title: reprepro distributions conf
+---
+Origin: erlang-builds
+Label: erlang-builds
+Codename: bookworm
+Suite: bookworm
+Architectures: amd64 arm64
+Components: main
+SignWith: yes
+Description: Erlang/OTP packages for bookworm
+
+Origin: erlang-builds
+Label: erlang-builds
+Codename: noble
+Suite: noble
+Architectures: amd64 arm64
+Components: main
+SignWith: yes
+Description: Erlang/OTP packages for noble
+

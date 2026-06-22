@@ -1,0 +1,36 @@
+#!/usr/bin/make -f
+export DEB_BUILD_MAINT_OPTIONS = hardening=+all
+
+%:
+	dh $@
+
+override_dh_auto_configure:
+	./configure --prefix=/usr --with-ssl --enable-dirty-schedulers
+
+# OTP's `make test` suite is huge and irrelevant to packaging; skip it.
+override_dh_auto_test:
+
+override_dh_auto_install:
+	$(MAKE) install DESTDIR=$(CURDIR)/debian/tmp
+
+override_dh_install:
+	# Carve optional apps out of the base tree into their own packages.
+	set -eu; for app in wx odbc; do \
+	  src=$$(ls -d debian/tmp/usr/lib/erlang/lib/$$app-*); \
+	  mkdir -p debian/erlang-$$app/usr/lib/erlang/lib; \
+	  mv $$src debian/erlang-$$app/usr/lib/erlang/lib/; \
+	done
+	# Dev: erl_interface + C headers (and its libs, if present).
+	mkdir -p debian/erlang-dev/usr/lib/erlang/lib debian/erlang-dev/usr/lib/erlang/usr
+	mv debian/tmp/usr/lib/erlang/lib/erl_interface-* debian/erlang-dev/usr/lib/erlang/lib/
+	mv debian/tmp/usr/lib/erlang/usr/include debian/erlang-dev/usr/lib/erlang/usr/
+	if [ -d debian/tmp/usr/lib/erlang/usr/lib ]; then \
+	  mv debian/tmp/usr/lib/erlang/usr/lib debian/erlang-dev/usr/lib/erlang/usr/; \
+	fi
+	# Base: everything that remains.
+	mkdir -p debian/erlang/usr/lib
+	mv debian/tmp/usr/lib/erlang debian/erlang/usr/lib/
+	mv debian/tmp/usr/bin debian/erlang/usr/
+
+override_dh_missing:
+	dh_missing --list-missing

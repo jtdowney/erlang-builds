@@ -1,0 +1,5 @@
+---
+version: 2.0.1
+title: forced version build matrix json
+---
+[{"otp":"28.1","codename":"bookworm","image":"debian:bookworm","arch":"amd64","runner":"ubuntu-24.04"}]

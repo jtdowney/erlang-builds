@@ -1,0 +1,9 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: erlang
+Source: https://github.com/erlang/otp
+
+Files: *
+Copyright: Ericsson AB
+License: Apache-2.0
+ Erlang/OTP is licensed under the Apache License, Version 2.0.
+ See https://github.com/erlang/otp/blob/master/LICENSE.txt for the full text.

@@ -1,0 +1,8 @@
+build/
+out/
+debs/
+repo/
+_site/
+*.deb
+detect/tags.txt
+detect/assets.txt

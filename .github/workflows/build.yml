@@ -1,0 +1,107 @@
+name: build
+
+on:
+  schedule:
+    - cron: "25 * * * *"
+  workflow_dispatch:
+    inputs:
+      otp_version:
+        description: "Force a specific OTP version (e.g. 28.1). Blank = auto-detect."
+        required: false
+        default: ""
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: erlang-builds
+  cancel-in-progress: false
+
+jobs:
+  detect:
+    name: Detect
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.detect.outputs.matrix }}
+      has_work: ${{ steps.detect.outputs.has_work }}
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - uses: erlef/setup-beam@fc68ffb90438ef2936bbb3251622353b3dcb2f93 # v1.24.0
+        with:
+          otp-version: "29"
+          gleam-version: "1.17"
+      - name: Collect OTP tags and existing assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api repos/erlang/otp/tags --paginate -q '.[].name' > detect/tags.txt
+          : > detect/assets.txt
+          for tag in $(gh release list --limit 200 --json tagName -q '.[].tagName' | grep '^OTP-' || true); do
+            gh release view "$tag" --json assets -q '.assets[].name' >> detect/assets.txt || true
+          done
+      - id: detect
+        name: Detect OTP versions to build
+        env:
+          FORCE_OTP: ${{ github.event.inputs.otp_version }}
+        run: |
+          cd detect
+          gleam run -- matrix tags.txt assets.txt "${FORCE_OTP}" >> "$GITHUB_OUTPUT"
+
+  build:
+    name: Build (OTP ${{ matrix.otp }}, Codename ${{ matrix.codename }}, Arch ${{ matrix.arch }})
+    needs: detect
+    if: needs.detect.outputs.has_work == 'true'
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include: ${{ fromJSON(needs.detect.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - name: Build package
+        run: |
+          docker run --rm \
+            -e OTP_VERSION='${{ matrix.otp }}' \
+            -e CODENAME='${{ matrix.codename }}' \
+            -e ARCH='${{ matrix.arch }}' \
+            -v "$PWD:/src" -w /src \
+            '${{ matrix.image }}' \
+            bash scripts/build_deb.sh
+      - name: Upload package to the OTP release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create 'OTP-${{ matrix.otp }}' \
+            --title 'OTP ${{ matrix.otp }}' \
+            --notes 'Erlang/OTP ${{ matrix.otp }}' 2>/dev/null || true
+          gh release upload 'OTP-${{ matrix.otp }}' out/*.deb --clobber
+
+  publish:
+    name: Publish
+    needs: [detect, build]
+    if: >-
+      always() && needs.detect.result == 'success'
+      && needs.build.result != 'failure'
+      && (needs.detect.outputs.has_work == 'true' || github.event_name == 'workflow_dispatch')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - uses: erlef/setup-beam@fc68ffb90438ef2936bbb3251622353b3dcb2f93 # v1.24.0
+        with:
+          otp-version: "29"
+          gleam-version: "1.17"
+      - name: Install reprepro
+        run: sudo apt-get update && sudo apt-get install -y reprepro
+      - name: Build APT repo
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+          PAGES_BASE_URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}
+        run: bash scripts/publish.sh
+      - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
+        with:
+          path: _site
+      - uses: actions/deploy-pages@cd2ce8fcbc39b97be8ca5fce6e763baed58fa128 # v5.0.0
