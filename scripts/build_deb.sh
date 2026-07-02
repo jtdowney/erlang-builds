@@ -10,7 +10,7 @@ apt-get install -y --no-install-recommends \
   build-essential devscripts equivs ca-certificates curl xz-utils file
 
 curl -fsSL -o /tmp/otp.tar.gz \
-  "https://github.com/erlang/otp/releases/download/OTP-${OTP_VERSION}/otp_src_${OTP_VERSION}.tar.gz"
+  "https://github.com/erlang/otp/archive/refs/tags/OTP-${OTP_VERSION}.tar.gz"
 
 rm -rf build && mkdir -p build
 tar -xzf /tmp/otp.tar.gz -C build --strip-components=1
