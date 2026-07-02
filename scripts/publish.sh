@@ -24,7 +24,9 @@ KEYGRIP=$(gpg --batch --with-keygrip --list-secret-keys | awk '/Keygrip/{print $
 
 (cd detect && gleam run -- distributions) > repo/conf/distributions
 shopt -s nullglob
-for deb in debs/*.deb; do
+debs=(debs/*.deb)
+(( ${#debs[@]} > 0 )) || { echo "::error::no .deb files downloaded; refusing to publish empty repo"; exit 1; }
+for deb in "${debs[@]}"; do
   codename=$(basename "$deb" | sed -E 's/.*-1[~.]([a-z]+)_.*/\1/')
   reprepro -b repo includedeb "$codename" "$deb"
 done
