@@ -31,7 +31,7 @@ jobs:
       - uses: erlef/setup-beam@fc68ffb90438ef2936bbb3251622353b3dcb2f93 # v1.24.0
         with:
           otp-version: "29"
-          gleam-version: "1.17"
+          gleam-version: "1.18"
       - name: Collect OTP tags and existing assets
         env:
           GH_TOKEN: ${{ github.token }}
@@ -90,7 +90,7 @@ jobs:
       - uses: erlef/setup-beam@fc68ffb90438ef2936bbb3251622353b3dcb2f93 # v1.24.0
         with:
           otp-version: "29"
-          gleam-version: "1.17"
+          gleam-version: "1.18"
       - name: Install reprepro
         run: sudo apt-get update && sudo apt-get install -y reprepro
       - name: Build APT repo
