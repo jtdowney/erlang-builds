@@ -18,11 +18,11 @@ const usage = "usage:
   detect distributions"
 
 pub type Distro {
-  Distro(codename: String, image: String)
+  Distro(codename: String, image: String, arches: List(String))
 }
 
 pub type Config {
-  Config(otp_lines: List(String), arches: List(String), distros: List(Distro))
+  Config(otp_lines: List(String), distros: List(Distro))
 }
 
 pub type BuildConfig {
@@ -32,6 +32,7 @@ pub type BuildConfig {
     image: String,
     arch: String,
     runner: String,
+    platform: String,
   )
 }
 
@@ -144,17 +145,24 @@ pub fn parse_config(toml_source: String) -> Result(Config, Nil) {
   )
   use distros <- result.try(
     tom.get_array(targets, ["distros"])
-    |> result.try(list.try_map(_, toml_as_distro))
+    |> result.try(list.try_map(_, fn(value) { toml_as_distro(arches, value) }))
     |> result.replace_error(Nil),
   )
-  Ok(Config(otp_lines:, arches:, distros:))
+  Ok(Config(otp_lines:, distros:))
 }
 
-fn toml_as_distro(value: tom.Toml) -> Result(Distro, tom.GetError) {
+fn toml_as_distro(
+  default_arches: List(String),
+  value: tom.Toml,
+) -> Result(Distro, tom.GetError) {
   use fields <- result.try(tom.as_table(value))
   use codename <- result.try(tom.get_string(fields, ["codename"]))
   use image <- result.try(tom.get_string(fields, ["image"]))
-  Ok(Distro(codename:, image:))
+  let arches =
+    tom.get_array(fields, ["arches"])
+    |> result.try(list.try_map(_, tom.as_string))
+    |> result.unwrap(default_arches)
+  Ok(Distro(codename:, image:, arches:))
 }
 
 pub fn build_outputs(
@@ -174,13 +182,7 @@ pub fn build_outputs(
     }
   }
 
-  let combos =
-    missing_matrix(
-      latest,
-      distros: config.distros,
-      arches: config.arches,
-      existing:,
-    )
+  let combos = missing_matrix(latest, distros: config.distros, existing:)
   let has_work = !list.is_empty(combos)
   Outputs(matrix: json.to_string(json.array(combos, combo_to_json)), has_work:)
 }
@@ -192,6 +194,7 @@ fn combo_to_json(combo: BuildConfig) -> Json {
     #("image", json.string(combo.image)),
     #("arch", json.string(combo.arch)),
     #("runner", json.string(combo.runner)),
+    #("platform", json.string(combo.platform)),
   ])
 }
 
@@ -288,10 +291,6 @@ pub fn parse_asset(name: String) -> Result(Package, Nil) {
 
   case string.split(string.drop_end(name, 4), "_") {
     [_package, middle, arch] -> {
-      use <- bool.guard(
-        when: arch != "amd64" && arch != "arm64",
-        return: Error(Nil),
-      )
       use #(version, release_codename) <- result.try(string.split_once(
         middle,
         "-",
@@ -309,7 +308,6 @@ pub fn parse_asset(name: String) -> Result(Package, Nil) {
 pub fn missing_matrix(
   latest: Dict(String, String),
   distros distros: List(Distro),
-  arches arches: List(String),
   existing existing: Set(Package),
 ) -> List(BuildConfig) {
   let versions =
@@ -318,7 +316,7 @@ pub fn missing_matrix(
     |> list.sort(compare_version)
   list.flat_map(versions, fn(version) {
     list.flat_map(distros, fn(distro) {
-      list.filter_map(arches, fn(arch) {
+      list.filter_map(distro.arches, fn(arch) {
         case
           set.contains(
             existing,
@@ -333,6 +331,7 @@ pub fn missing_matrix(
               image: distro.image,
               arch:,
               runner: runner_for(arch),
+              platform: platform_for(arch),
             ))
         }
       })
@@ -343,26 +342,34 @@ pub fn missing_matrix(
 fn runner_for(arch: String) -> String {
   case arch {
     "arm64" -> "ubuntu-24.04-arm"
+    // armhf has no native runner: it builds under qemu on amd64.
     _ -> "ubuntu-24.04"
   }
 }
 
+fn platform_for(arch: String) -> String {
+  case arch {
+    "arm64" -> "linux/arm64"
+    "armhf" -> "linux/arm/v7"
+    _ -> "linux/amd64"
+  }
+}
+
 pub fn distributions(config: Config) -> String {
-  let architectures = string.join(config.arches, " ")
   config.distros
-  |> list.map(distribution_stanza(_, architectures))
+  |> list.map(distribution_stanza)
   |> string.join("\n\n")
   |> string.append("\n")
 }
 
-fn distribution_stanza(distro: Distro, architectures: String) -> String {
+fn distribution_stanza(distro: Distro) -> String {
   string.join(
     [
       "Origin: erlang-builds",
       "Label: erlang-builds",
       "Codename: " <> distro.codename,
       "Suite: " <> distro.codename,
-      "Architectures: " <> architectures,
+      "Architectures: " <> string.join(distro.arches, " "),
       "Components: main",
       "SignWith: yes",
       "Description: Erlang/OTP packages for " <> distro.codename,

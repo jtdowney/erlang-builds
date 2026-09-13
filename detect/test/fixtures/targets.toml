@@ -2,6 +2,6 @@
 otp_lines = ["28", "29"]
 arches = ["amd64", "arm64"]
 distros = [
-  { codename = "bookworm", image = "debian:bookworm" },
+  { codename = "bookworm", image = "debian:bookworm", arches = ["amd64", "arm64", "armhf"] },
   { codename = "noble", image = "ubuntu:24.04" },
 ]

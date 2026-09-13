@@ -1,5 +1,7 @@
 ---
 version: 2.0.1
 title: forced version build matrix json
+file: ./test/detect_test.gleam
+test_name: forced_version_matrix_json_test
 ---
-[{"otp":"28.1","codename":"bookworm","image":"debian:bookworm","arch":"amd64","runner":"ubuntu-24.04"}]
+[{"otp":"28.1","codename":"bookworm","image":"debian:bookworm","arch":"amd64","runner":"ubuntu-24.04","platform":"linux/amd64"}]

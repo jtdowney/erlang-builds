@@ -60,9 +60,13 @@ jobs:
         include: ${{ fromJSON(needs.detect.outputs.matrix) }}
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - name: Register binfmt handlers
+        if: matrix.arch == 'armhf'
+        run: sudo apt-get update && sudo apt-get install -y qemu-user-static binfmt-support
       - name: Build package
         run: |
           docker run --rm \
+            --platform '${{ matrix.platform }}' \
             -e OTP_VERSION='${{ matrix.otp }}' \
             -e CODENAME='${{ matrix.codename }}' \
             -e ARCH='${{ matrix.arch }}' \

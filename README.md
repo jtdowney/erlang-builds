@@ -1,6 +1,6 @@
 # Debian/Ubuntu Erlang Builds
 
-APT repository serving Erlang/OTP built from source for Debian and Ubuntu (amd64 + arm64).
+APT repository serving Erlang/OTP built from source for Debian and Ubuntu (amd64 + arm64, plus armhf on Debian).
 
 ## Install
 
