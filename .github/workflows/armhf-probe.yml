@@ -1,0 +1,65 @@
+name: armhf probe
+
+# Throwaway: answers two questions and uploads nothing.
+#   1. Can the arm64 runner execute 32-bit ARM natively? (if yes, no emulation needed)
+#   2. How long does one emulated armhf OTP build actually take?
+# Delete this file once armhf is either shipped or abandoned.
+
+on:
+  workflow_dispatch:
+    inputs:
+      otp_version:
+        description: "OTP version to build"
+        required: false
+        default: "29.0.6"
+      codename:
+        description: "Distro codename"
+        required: false
+        default: "trixie"
+      image:
+        description: "Base image"
+        required: false
+        default: "debian:trixie"
+
+jobs:
+  native:
+    name: Can arm64 run armhf natively?
+    runs-on: ubuntu-24.04-arm
+    steps:
+      - name: Execute an armv7 container with no emulation installed
+        run: |
+          if out=$(docker run --rm --platform linux/arm/v7 debian:bookworm uname -m 2>&1); then
+            echo "NATIVE armhf WORKS: $out" | tee -a "$GITHUB_STEP_SUMMARY"
+          else
+            {
+              echo "No native armhf; emulation required."
+              echo '```'
+              echo "$out"
+              echo '```'
+            } | tee -a "$GITHUB_STEP_SUMMARY"
+          fi
+
+  emulated:
+    name: Time one emulated armhf build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 350
+    steps:
+      - uses: actions/checkout@v7
+      - name: Register binfmt handlers
+        run: sudo apt-get update && sudo apt-get install -y qemu-user-static binfmt-support
+      - name: Build
+        run: |
+          start=$SECONDS
+          docker run --rm --platform linux/arm/v7 \
+            -e OTP_VERSION='${{ inputs.otp_version }}' \
+            -e CODENAME='${{ inputs.codename }}' \
+            -e ARCH=armhf \
+            -v "$PWD:/src" -w /src \
+            '${{ inputs.image }}' \
+            bash scripts/build_deb.sh
+          elapsed=$(( SECONDS - start ))
+          printf 'armhf %s on %s: %dh%02dm\n' \
+            '${{ inputs.otp_version }}' '${{ inputs.codename }}' \
+            $(( elapsed / 3600 )) $(( elapsed % 3600 / 60 )) \
+            | tee -a "$GITHUB_STEP_SUMMARY"
+          ls -l out/ | tee -a "$GITHUB_STEP_SUMMARY"
