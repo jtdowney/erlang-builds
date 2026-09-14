@@ -28,6 +28,12 @@ debs=(debs/*.deb)
 (( ${#debs[@]} > 0 )) || { echo "::error::no .deb files downloaded; refusing to publish empty repo"; exit 1; }
 for deb in "${debs[@]}"; do
   codename=$(basename "$deb" | sed -E 's/.*-1[~.]([a-z]+)_.*/\1/')
+  # Releases keep assets for suites we no longer build (e.g. EOL distros).
+  # reprepro errors on an unknown codename, which would fail the whole publish.
+  if ! grep -qx "Codename: $codename" repo/conf/distributions; then
+    echo "skipping $(basename "$deb"): no '$codename' suite configured"
+    continue
+  fi
   reprepro -b repo includedeb "$codename" "$deb"
 done
 

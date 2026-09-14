@@ -16,7 +16,6 @@ birdie = ">= 2.0.1 and < 3.0.0"
 otp_lines = ["28", "29"]
 arches = ["amd64", "arm64"]
 distros = [
-  { codename = "bullseye", image = "debian:bullseye", arches = ["amd64", "arm64", "armhf"] },
   { codename = "bookworm", image = "debian:bookworm", arches = ["amd64", "arm64", "armhf"] },
   { codename = "trixie", image = "debian:trixie", arches = ["amd64", "arm64", "armhf"] },
   { codename = "forky", image = "debian:forky", arches = ["amd64", "arm64", "armhf"] },
