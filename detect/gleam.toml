@@ -21,7 +21,6 @@ distros = [
   { codename = "forky", image = "debian:forky", arches = ["amd64", "arm64", "armhf"] },
   { codename = "jammy", image = "ubuntu:22.04" },
   { codename = "noble", image = "ubuntu:24.04" },
-  { codename = "questing", image = "ubuntu:25.10" },
   { codename = "resolute", image = "ubuntu:26.04" },
   { codename = "stonking", image = "ubuntu:26.10" },
 ]
