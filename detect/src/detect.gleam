@@ -13,7 +13,8 @@ import gleam/string
 import simplifile
 import tom
 
-const usage = "usage:
+const usage =
+  "usage:
   detect matrix <tags_file> <assets_file> [force]
   detect distributions"
 
@@ -341,8 +342,7 @@ pub fn missing_matrix(
 
 fn runner_for(arch: String) -> String {
   case arch {
-    "arm64" -> "ubuntu-26.04-arm"
-    // armhf has no native runner: it builds under qemu on amd64.
+    "arm" <> _ -> "ubuntu-26.04-arm"
     _ -> "ubuntu-26.04"
   }
 }
