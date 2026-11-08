@@ -341,9 +341,9 @@ pub fn missing_matrix(
 
 fn runner_for(arch: String) -> String {
   case arch {
-    "arm64" -> "ubuntu-24.04-arm"
+    "arm64" -> "ubuntu-26.04-arm"
     // armhf has no native runner: it builds under qemu on amd64.
-    _ -> "ubuntu-24.04"
+    _ -> "ubuntu-26.04"
   }
 }
 

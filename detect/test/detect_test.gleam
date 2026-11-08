@@ -69,7 +69,7 @@ pub fn missing_matrix_skips_built_combos_test() {
         codename: "bookworm",
         image: "debian:bookworm",
         arch: "arm64",
-        runner: "ubuntu-24.04-arm",
+        runner: "ubuntu-26.04-arm",
         platform: "linux/arm64",
       ),
       detect.BuildConfig(
@@ -77,7 +77,7 @@ pub fn missing_matrix_skips_built_combos_test() {
         codename: "bookworm",
         image: "debian:bookworm",
         arch: "armhf",
-        runner: "ubuntu-24.04",
+        runner: "ubuntu-26.04",
         platform: "linux/arm/v7",
       ),
     ]
