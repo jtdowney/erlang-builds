@@ -3,11 +3,11 @@ import detect
 import gleam/dict
 import gleam/order
 import gleam/set
-import gleeunit
+import unitest
 import simplifile
 
 pub fn main() {
-  gleeunit.main()
+  unitest.main()
 }
 
 pub fn latest_per_line_picks_highest_stable_patch_test() {
